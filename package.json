@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "start:local": "next start -p 3100",
+    "restart:local": "bash scripts/restart-server.sh",
+    "e2e": "node scripts/e2e.mjs",
+    "thumbs": "node scripts/thumbs.mjs"
   },
   "dependencies": {
     "html-to-image": "^1.11.13",
