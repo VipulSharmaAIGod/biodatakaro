@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { activeProvider } from "@/lib/payments";
+import { activeProvider, paymentsAvailable } from "@/lib/payments";
 import { clientIp, rateLimit } from "@/lib/rate-limit";
 import { BIODATA_ID_RE, issueUnlockToken } from "@/lib/unlock-token";
 
@@ -14,6 +14,7 @@ const RESTORE_WINDOW_DAYS = 365;
  * recorded in the order notes. Cuts support tickets ("I paid but lost my download").
  */
 export async function POST(req: Request) {
+  if (!paymentsAvailable()) return NextResponse.json({ error: "Payments are launching soon." }, { status: 503 });
   const rl = rateLimit(`restore:${clientIp(req)}`, 10, 60 * 60_000);
   if (!rl.ok) return NextResponse.json({ error: "Too many attempts. Try again later." }, { status: 429 });
   const { paymentId } = (await req.json().catch(() => ({}))) as { paymentId?: string };

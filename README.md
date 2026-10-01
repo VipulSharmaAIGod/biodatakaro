@@ -23,7 +23,7 @@ npm run thumbs                      # regenerate public/templates/*.webp gallery
 npm run lint
 ```
 
-With no keys set, the app runs in **mock payment mode**. A yellow "TEST MODE" banner shows and the checkout is simulated, so you can test the whole flow without spending anything. The AI text then comes from the built-in template writer.
+With no Razorpay keys and `ALLOW_MOCK_PAYMENTS=true` in `.env.local` (needed for local `next start`, which runs with `NODE_ENV=production`; `npm run dev` doesn't need it), the app runs in **mock payment mode**. A yellow "TEST MODE" banner shows and the checkout is simulated, so you can test the whole flow without spending anything. On a public deployment without keys, the paid buttons show **"Launching soon"** and free watermarked downloads still work. The AI text then comes from the built-in template writer.
 
 ---
 
@@ -89,7 +89,7 @@ These are also strongly recommended:
 | `OPENAI_MODEL` | `gpt-6-luna` | Any OpenAI model ID that supports the Responses API. |
 | `AI_RATE_LIMIT_PER_MIN` / `AI_RATE_LIMIT_PER_DAY` | 6 / 40 | Per IP, in memory. |
 | `PAYMENTS_DISABLE_MOCK` | none | `1` refuses mock payments when there are no keys. |
-| `PAYMENTS_ALLOW_MOCK` | none | Mock mode is **off by default on Vercel production** (`VERCEL_ENV=production`). Set this to `1` only to demo it there. |
+| `ALLOW_MOCK_PAYMENTS` | none | Mock payments are **off whenever `NODE_ENV=production`** (any `next start`, Render, Vercel) unless this is exactly `true`. Set it only in your local `.env.local`. Never set it on a public host. Without Razorpay keys and without this flag, the paid buttons show "Launching soon" and free watermarked downloads keep working. |
 | `NEXT_PUBLIC_ADSENSE_CLIENT` | none | Reserved. The slot stays empty until you add AdSense code yourself. |
 
 If no AI key is set, the template writer covers English, Hindi, Marathi and Gujarati. The other six languages fall back to English text with a note, so set a Gemini key to get real Bengali, Tamil, Telugu, Kannada, Punjabi and Malayalam text.
@@ -184,6 +184,18 @@ Implement `PaymentProvider` (`src/lib/payments/types.ts`): `createOrder`, `verif
 - The template writer covers en/hi/mr/gu. Other languages need `GEMINI_API_KEY` or `OPENAI_API_KEY`.
 - Translations of labels and SEO copy were written without a native-speaker review. Get each language checked.
 - Real LLM calls and real Razorpay payments were **not** exercised (no keys). The code paths were tested against the APIs with fake credentials, which correctly returned 401, and against mock mode end to end.
+
+## Deploying on Render (free plan)
+
+- **Settings:** runtime Node, plan **free**, region Singapore.
+- **Build command:** `npm ci --include=dev && npm run build`. `--include=dev` is needed because `NODE_ENV=production` would otherwise skip Tailwind and TypeScript.
+- **Start command:** `npm start`. `next start` listens on Render's `$PORT`.
+- **Node version:** pinned by `.node-version` (20.19.2) and `NODE_VERSION`.
+- **Env vars:** `NODE_ENV=production`, `NEXT_PUBLIC_SITE_URL=https://<service>.onrender.com`, `UNLOCK_TOKEN_SECRET=<random hex>`.
+- **`NEXT_PUBLIC_*` values are baked in at build time.** Redeploy after you change them.
+- `render.yaml` documents the same settings.
+- After deploying, run `BASE=https://<service>.onrender.com node scripts/smoke-live.mjs` to check the public deployment. It confirms there's no mock checkout, the paid buttons are disabled, the free watermarked PDF and JPG work, and the sitemap and robots use the live URL.
+- Free instances sleep after about 15 minutes idle, so the first request after that takes around a minute. Upgrade or move to Vercel before spending on traffic.
 
 ## Launch checklist
 

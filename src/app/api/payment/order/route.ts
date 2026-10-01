@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { signBlob } from "@/lib/crypto";
-import { activeProvider, mockAllowed } from "@/lib/payments";
+import { activeProvider, paymentsAvailable } from "@/lib/payments";
 import { PRICES, UPGRADE_PAISE } from "@/lib/pricing";
 import type { OrderTicket } from "@/lib/payments/types";
 import { clientIp, rateLimit } from "@/lib/rate-limit";
@@ -20,7 +20,7 @@ export async function POST(req: Request) {
   if (!BIODATA_ID_RE.test(bid) || !tier) return NextResponse.json({ error: "Invalid request" }, { status: 400 });
 
   const provider = activeProvider();
-  if (provider.name === "mock" && !mockAllowed()) return NextResponse.json({ error: "Payments are not configured" }, { status: 503 });
+  if (!paymentsAvailable()) return NextResponse.json({ error: "Payments are launching soon." }, { status: 503 });
 
   let amount = PRICES[tier].amountPaise;
   let upgrade = false;

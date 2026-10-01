@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { readBlob } from "@/lib/crypto";
-import { activeProvider } from "@/lib/payments";
+import { activeProvider, paymentsAvailable } from "@/lib/payments";
 import { issueUnlockToken } from "@/lib/unlock-token";
 import type { OrderTicket } from "@/lib/payments/types";
 
@@ -8,6 +8,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
+  if (!paymentsAvailable()) return NextResponse.json({ error: "Payments are launching soon." }, { status: 503 });
   const body = (await req.json().catch(() => ({}))) as { orderId?: string; paymentId?: string; signature?: string; ticket?: string };
   const ticket = readBlob<OrderTicket>(String(body.ticket || ""), "ticket");
   if (!ticket || ticket.oid !== body.orderId || ticket.exp < Date.now() / 1000) {

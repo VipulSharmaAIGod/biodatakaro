@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { activeProvider } from "@/lib/payments";
+import { activeProvider, paymentsAvailable } from "@/lib/payments";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -11,6 +11,7 @@ export const dynamic = "force-dynamic";
  * statelessly through /api/payment/restore.
  */
 export async function POST(req: Request) {
+  if (!paymentsAvailable()) return NextResponse.json({ error: "Payments are launching soon." }, { status: 503 });
   const raw = await req.text();
   const sig = req.headers.get("x-razorpay-signature");
   const provider = activeProvider();

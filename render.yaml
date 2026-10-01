@@ -1,0 +1,23 @@
+# Render Blueprint (optional; the service was created via the Render API with the same settings).
+services:
+  - type: web
+    name: biodatakaro
+    runtime: node
+    plan: free
+    region: singapore
+    branch: main
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npm start # next start binds to $PORT provided by Render
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 20.19.2
+      - key: NEXT_PUBLIC_SITE_URL
+        sync: false # e.g. https://biodatakaro.onrender.com (baked in at build time → redeploy after changing)
+      - key: UNLOCK_TOKEN_SECRET
+        generateValue: true
+      # Add when ready: RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET, RAZORPAY_WEBHOOK_SECRET, GEMINI_API_KEY,
+      # NEXT_PUBLIC_OWNER_NAME, NEXT_PUBLIC_CONTACT_EMAIL, NEXT_PUBLIC_CONTACT_PHONE, NEXT_PUBLIC_CONTACT_ADDRESS, NEXT_PUBLIC_OWNER_CITY
+      # NEVER set ALLOW_MOCK_PAYMENTS on a public deployment.

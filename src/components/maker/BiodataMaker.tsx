@@ -96,7 +96,7 @@ export default function BiodataMaker() {
     <div className="mx-auto w-full max-w-6xl px-3 pb-28 pt-3 sm:px-5 lg:pb-10">
       {cfg && !cfg.available && (
         <div className="mb-3 rounded-xl border border-stone-300 bg-white px-3 py-2 text-[13px] text-stone-700" data-testid="payments-off-banner">
-          Paid downloads are being set up. You can still create your biodata and download the free version with a watermark.
+          <b>Payments launching soon.</b> You can create your biodata and download the free version (with a small watermark) right now.
         </div>
       )}
       {cfg?.mode === "mock" && cfg.available && (
@@ -317,6 +317,7 @@ function DownloadStep({
     }
   };
 
+  const payOff = !cfg || !cfg.available;
   const price = (t: Tier) => (t === "premium" && unlock?.tier === "basic" ? cfg?.prices.upgrade ?? 5000 : PRICES[t].amountPaise);
 
   return (
@@ -363,6 +364,11 @@ function DownloadStep({
         <Card className="border-gold/60">
           <h3 className="text-[17px] font-bold text-stone-900">Remove watermark &amp; unlock designs</h3>
           <p className="mt-1 text-[14px] text-stone-600">One-time payment for this biodata. UPI, cards, netbanking. No subscription, no login.</p>
+          {cfg && !cfg.available && (
+            <p className="mt-3 rounded-xl bg-stone-100 p-3 text-[13px] text-stone-700" data-testid="payments-soon">
+              <b>Payments launching soon.</b> Paid plans will be available in a few days. Free downloads with a watermark work now.
+            </p>
+          )}
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {(["basic", "premium"] as Tier[])
               .filter((t) => !(t === "basic" && unlock?.tier === "basic"))
@@ -379,24 +385,28 @@ function DownloadStep({
                       <li key={f}>✓ {f}</li>
                     ))}
                   </ul>
-                  <Button className="mt-3 w-full" variant={t === "premium" ? "primary" : "secondary"} disabled={!!busy} onClick={() => buy(t)} data-testid={`buy-${t}`}>
-                    {busy === "pay" ? <Spinner /> : null} Pay {rupees(price(t))}
+                  <Button className="mt-3 w-full" variant={t === "premium" ? "primary" : "secondary"} disabled={!!busy || payOff} onClick={() => buy(t)} data-testid={`buy-${t}`}>
+                    {busy === "pay" ? <Spinner /> : null} {cfg && !cfg.available ? "Launching soon" : `Pay ${rupees(price(t))}`}
                   </Button>
                 </div>
               ))}
           </div>
-          <p className="mt-3 text-[12px] text-stone-500">
-            Secure payment via {cfg?.provider === "razorpay" ? "Razorpay" : "Razorpay (test mode)"}. By paying you agree to our <Link href="/terms" className="underline">Terms</Link> and{" "}
-            <Link href="/refund-policy" className="underline">Refund Policy</Link>.
-          </p>
+          {cfg?.available && (
+            <p className="mt-3 text-[12px] text-stone-500">
+              Secure payment via {cfg.provider === "razorpay" ? "Razorpay" : "Razorpay (test mode)"}. By paying you agree to our <Link href="/terms" className="underline">Terms</Link> and{" "}
+              <Link href="/refund-policy" className="underline">Refund Policy</Link>.
+            </p>
+          )}
         </Card>
       )}
 
-      <div className="text-center">
-        <button type="button" className="text-[14px] font-semibold text-brand underline" onClick={() => setRestoreOpen(true)} data-testid="restore-open">
-          Already paid? Restore purchase
-        </button>
-      </div>
+      {cfg?.available && (
+        <div className="text-center">
+          <button type="button" className="text-[14px] font-semibold text-brand underline" onClick={() => setRestoreOpen(true)} data-testid="restore-open">
+            Already paid? Restore purchase
+          </button>
+        </div>
+      )}
 
       <Modal open={!!mockOrder} onClose={() => mockOrder?.reject(new Error("cancelled"))} title="Test payment (no real money)">
         {mockOrder && (
