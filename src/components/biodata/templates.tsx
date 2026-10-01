@@ -64,8 +64,8 @@ function Classic({ b, heading, title, blocks }: TplProps) {
     <div style={{ ...pageStyle, background: "radial-gradient(ellipse at center, #fffdf6 0%, #fbf1dc 100%)", color: "#2b1a12", fontFamily: FONT_STACK.serif }}>
       <div style={{ position: "absolute", inset: 16, border: `3px solid ${maroon}` }} />
       <div style={{ position: "absolute", inset: 24, border: `1px solid ${gold}` }} />
-      <Corners color={gold} accent={maroon} size={104} inset={28} />
-      <div style={{ position: "absolute", inset: "44px 62px 44px", display: "flex", flexDirection: "column" }}>
+      <Corners color={gold} accent={maroon} size={84} bottomSize={60} inset={28} />
+      <div style={{ position: "absolute", inset: "46px 68px 84px", display: "flex", flexDirection: "column" }}>
         <Heading text={heading} color={maroon} size="1.1em" />
         {b.showTitle && (
           <div style={{ textAlign: "center", marginTop: "0.25em" }}>
@@ -133,9 +133,9 @@ function Floral({ b, heading, title, blocks }: TplProps) {
   return (
     <div style={{ ...pageStyle, background: "linear-gradient(180deg, #fff7fa 0%, #fff0f5 100%)", color: "#3b1d2a", fontFamily: FONT_STACK.serif }}>
       <div style={{ position: "absolute", inset: 20, border: `2px solid ${soft}`, borderRadius: 18 }} />
-      <FloralCorner color={soft} accent="#7aa36a" size={210} style={{ position: "absolute", top: 4, left: 4 }} />
-      <FloralCorner color={soft} accent="#7aa36a" size={210} style={{ position: "absolute", bottom: 4, right: 4, transform: "rotate(180deg)" }} />
-      <div style={{ position: "absolute", inset: "46px 64px 50px", display: "flex", flexDirection: "column" }}>
+      <FloralCorner color={soft} accent="#7aa36a" size={160} style={{ position: "absolute", top: 4, left: 4 }} />
+      <FloralCorner color={soft} accent="#7aa36a" size={160} style={{ position: "absolute", bottom: 4, right: 4, transform: "rotate(180deg)" }} />
+      <div style={{ position: "absolute", inset: "50px 72px 62px", display: "flex", flexDirection: "column" }}>
         <Heading text={heading} color={rose} size="1.05em" />
         {b.showTitle && (
           <div style={{ textAlign: "center", fontFamily: FONT_STACK.display, fontStyle: "italic", color: rose, fontSize: "2.05em", fontWeight: 600, marginTop: "0.15em" }}>{title}</div>
@@ -170,8 +170,8 @@ function Royal({ b, name, heading, title, blocks }: TplProps) {
       <div style={{ position: "absolute", inset: 14, border: `2px solid ${gold}` }} />
       <div style={{ position: "absolute", inset: 20, border: `1px solid ${gold}`, opacity: 0.7 }} />
       <div style={{ position: "absolute", inset: 26, border: `4px double ${gold}`, opacity: 0.5 }} />
-      <Corners color={gold} accent={gold} size={120} inset={24} />
-      <div style={{ position: "absolute", inset: "46px 66px 46px", display: "flex", flexDirection: "column" }}>
+      <Corners color={gold} accent={gold} size={92} bottomSize={60} inset={24} />
+      <div style={{ position: "absolute", inset: "46px 74px 82px", display: "flex", flexDirection: "column" }}>
         <Heading text={heading} color={gold} size="1.1em" />
         <div style={{ display: "flex", justifyContent: "center", margin: "0.3em 0 0.2em" }}>
           <Photo src={b.photo} width={150} radius="80px 80px 8px 8px" border={`3px solid ${gold}`} shadow={`0 0 0 6px rgba(217,181,74,.25)`} />
@@ -251,8 +251,8 @@ function Peacock({ b, name, heading, title, blocks }: TplProps) {
     <div style={{ ...pageStyle, background: "linear-gradient(160deg, #f2fbf9 0%, #e6f4f1 100%)", color: "#123234", fontFamily: FONT_STACK.serif }}>
       <div style={{ position: "absolute", inset: 0, border: `14px solid ${teal}` }} />
       <div style={{ position: "absolute", inset: 20, border: `1.5px solid ${gold}` }} />
-      <PeacockFeather size={150} rot={-28} style={{ position: "absolute", right: 10, top: 6 }} />
-      <PeacockFeather size={130} rot={150} style={{ position: "absolute", left: 14, bottom: 4 }} />
+      <PeacockFeather size={118} rot={-30} style={{ position: "absolute", right: 22, top: 18 }} />
+      <PeacockFeather size={118} rot={30} style={{ position: "absolute", left: 22, top: 18 }} />
       <div style={{ position: "absolute", inset: "46px 70px 46px", display: "flex", flexDirection: "column" }}>
         <Heading text={heading} color={teal} size="1.08em" />
         {b.showTitle && <div style={{ textAlign: "center", color: gold, letterSpacing: "0.28em", textTransform: "uppercase", fontSize: "0.82em", fontWeight: 700, marginTop: "0.5em" }}>{title}</div>}
@@ -288,7 +288,7 @@ function Emerald({ b, name, heading, title, blocks }: TplProps) {
   const gold = "#d9b65d";
   return (
     <div style={{ ...pageStyle, background: "#f4faf6", color: "#0f2a20", fontFamily: FONT_STACK.serif }}>
-      <StarPattern color={green} opacity={0.06} />
+      <StarPattern color={green} opacity={0.035} />
       <div style={{ position: "absolute", left: 0, right: 0, top: 0, height: 250, background: `linear-gradient(180deg, #054d39, ${green})`, overflow: "hidden" }}>
         <StarPattern color={gold} opacity={0.22} />
         <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 4, background: gold }} />

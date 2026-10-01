@@ -79,7 +79,7 @@ export const BiodataDocument = forwardRef<HTMLDivElement, BiodataDocumentProps>(
   }, [deps]);
 
   return (
-    <div ref={ref} className={className} lang={b.lang} data-template={tpl.id} style={{ position: "relative", width: 794, height: 1123 }}>
+    <div ref={ref} className={className} lang={b.lang} data-template={tpl.id} data-script={b.lang === "en" ? "latin" : "indic"} style={{ position: "relative", width: 794, height: 1123 }}>
       <Tpl b={b} name={(b.fields.fullName || "").trim()} heading={b.heading} title={dict.title} blocks={blocks} contact={contact} />
       {watermark && <Watermark kind={watermark} dark={tpl.id === "royal"} />}
     </div>

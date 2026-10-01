@@ -97,7 +97,7 @@ export function Photo({
 export function Heading({ text, color, size = "1.05em", style }: { text: string; color: string; size?: string; style?: React.CSSProperties }) {
   if (!text) return null;
   return (
-    <div dir="auto" style={{ color, fontSize: size, fontWeight: 600, textAlign: "center", letterSpacing: "0.02em", ...style }}>
+    <div dir="auto" style={{ color, fontSize: size, fontWeight: 600, textAlign: "center", ...style }}>
       {text}
     </div>
   );

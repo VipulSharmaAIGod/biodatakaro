@@ -70,3 +70,8 @@ body {
 .prose-bk th {
   background: #faf5ef;
 }
+
+/* Letter-spacing breaks Indic conjunct shaping — disable it inside non-Latin biodata documents. */
+[data-script="indic"] * {
+  letter-spacing: 0 !important;
+}

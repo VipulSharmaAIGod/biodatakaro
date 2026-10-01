@@ -28,14 +28,15 @@ export function CornerFlourish({ color, accent, size = 120, style }: P & { size?
   );
 }
 
-export function Corners({ color, accent, size = 120, inset = 10 }: P & { size?: number; inset?: number }) {
+export function Corners({ color, accent, size = 120, bottomSize, inset = 10 }: P & { size?: number; bottomSize?: number; inset?: number }) {
+  const bs = bottomSize ?? size;
   const base: React.CSSProperties = { position: "absolute", pointerEvents: "none" };
   return (
     <>
       <CornerFlourish color={color} accent={accent} size={size} style={{ ...base, top: inset, left: inset }} />
       <CornerFlourish color={color} accent={accent} size={size} style={{ ...base, top: inset, right: inset, transform: "scaleX(-1)" }} />
-      <CornerFlourish color={color} accent={accent} size={size} style={{ ...base, bottom: inset, left: inset, transform: "scaleY(-1)" }} />
-      <CornerFlourish color={color} accent={accent} size={size} style={{ ...base, bottom: inset, right: inset, transform: "scale(-1,-1)" }} />
+      <CornerFlourish color={color} accent={accent} size={bs} style={{ ...base, bottom: inset, left: inset, transform: "scaleY(-1)" }} />
+      <CornerFlourish color={color} accent={accent} size={bs} style={{ ...base, bottom: inset, right: inset, transform: "scale(-1,-1)" }} />
     </>
   );
 }
