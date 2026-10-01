@@ -187,6 +187,21 @@ export function DetailsStep({ b, update }: { b: Biodata; update: Update }) {
 
 /* ============================== About (AI) ============================== */
 
+/** Rough script detection so we can warn when the About text doesn't match the chosen language. */
+const SCRIPT_RE: Record<string, RegExp> = {
+  en: /[A-Za-z]/g, hi: /[\u0900-\u097F]/g, mr: /[\u0900-\u097F]/g, gu: /[\u0A80-\u0AFF]/g, bn: /[\u0980-\u09FF]/g, ta: /[\u0B80-\u0BFF]/g,
+  te: /[\u0C00-\u0C7F]/g, kn: /[\u0C80-\u0CFF]/g, pa: /[\u0A00-\u0A7F]/g, ml: /[\u0D00-\u0D7F]/g,
+};
+function scriptMismatch(text: string, lang: string): boolean {
+  const t = text.replace(/\s/g, "");
+  if (t.length < 30) return false;
+  const re = SCRIPT_RE[lang];
+  if (!re) return false;
+  const share = (t.match(re)?.length ?? 0) / t.length;
+  // English names/companies are common inside Indic text, so only flag when very little of the text is in the expected script.
+  return lang === "en" ? share < 0.3 : share < 0.15;
+}
+
 const PART_LABEL = { aboutMe: "About me", aboutFamily: "About family", expectations: "Partner expectations" } as const;
 type Part = keyof typeof PART_LABEL;
 
@@ -269,6 +284,11 @@ export function AboutStep({ b, update }: { b: Biodata; update: Update }) {
               ))}
             </div>
           </fieldset>
+          {scriptMismatch(b.about.aboutMe, b.lang) && (
+            <p className="rounded-xl bg-amber-50 p-3 text-[13px] text-amber-900" data-testid="lang-mismatch">
+              Your About text seems to be in a different language from {LANGS.find((l) => l.code === b.lang)?.name}. Tap “Rewrite with AI” to write it again, or edit it below.
+            </p>
+          )}
           {!b.fields.gender && <p className="rounded-xl bg-amber-50 p-3 text-[13px] text-amber-900">Tip: choose Girl or Boy on the Details step so the grammar is correct.</p>}
           <Button onClick={generate} disabled={busy || !parts.length} data-testid="ai-generate">
             {busy ? <Spinner /> : "✨"} {busy ? "Writing…" : b.about.aboutMe ? "Rewrite with AI" : "Write with AI"}
