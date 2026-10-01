@@ -1,26 +1,72 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-brand: #7a1f2b;
+  --color-brand-dark: #5e1620;
+  --color-gold: #c9a227;
+  --color-cream: #fffaf2;
+  --font-sans: var(--font-ui), var(--font-deva-sans), var(--font-guj), system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-cream);
+  color: #1c1917;
+  font-family: var(--font-sans);
+}
+
+/* Long-form content (SEO + legal pages) */
+.prose-bk h2 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin: 2rem 0 0.75rem;
+  color: #1c1917;
+}
+.prose-bk h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 1.4rem 0 0.5rem;
+}
+.prose-bk p,
+.prose-bk li {
+  font-size: 1rem;
+  line-height: 1.75;
+  color: #44403c;
+}
+.prose-bk p {
+  margin: 0.6rem 0;
+}
+.prose-bk ul {
+  list-style: disc;
+  padding-left: 1.3rem;
+  margin: 0.5rem 0;
+}
+.prose-bk ol {
+  list-style: decimal;
+  padding-left: 1.3rem;
+  margin: 0.5rem 0;
+}
+.prose-bk a {
+  color: var(--color-brand);
+  text-decoration: underline;
+}
+.prose-bk table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.8rem 0;
+  font-size: 0.95rem;
+}
+.prose-bk th,
+.prose-bk td {
+  border: 1px solid #e7e5e4;
+  padding: 0.5rem 0.65rem;
+  text-align: left;
+  vertical-align: top;
+}
+.prose-bk th {
+  background: #faf5ef;
 }

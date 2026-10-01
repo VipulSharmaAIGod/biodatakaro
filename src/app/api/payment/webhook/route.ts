@@ -1,0 +1,28 @@
+import { NextResponse } from "next/server";
+import { activeProvider } from "@/lib/payments";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+/**
+ * Razorpay webhook (configure in Dashboard → Webhooks with events payment.captured, order.paid, payment.failed, refund.processed).
+ * There is no database, so this endpoint verifies the signature and logs the event for reconciliation
+ * (visible in Vercel logs). Unlocks are issued client-side via /api/payment/verify, and can be recovered
+ * statelessly through /api/payment/restore.
+ */
+export async function POST(req: Request) {
+  const raw = await req.text();
+  const sig = req.headers.get("x-razorpay-signature");
+  const provider = activeProvider();
+  if (!provider.verifyWebhook(raw, sig)) {
+    return NextResponse.json({ ok: false, error: "invalid signature" }, { status: 400 });
+  }
+  try {
+    const evt = JSON.parse(raw) as { event?: string; payload?: { payment?: { entity?: { id?: string; amount?: number; status?: string; notes?: Record<string, string> } } } };
+    const p = evt.payload?.payment?.entity;
+    console.log(`[webhook] ${evt.event} payment=${p?.id} amount=${p?.amount} status=${p?.status} bid=${p?.notes?.bid ?? "-"} tier=${p?.notes?.tier ?? "-"}`);
+  } catch {
+    console.log("[webhook] received non-JSON body");
+  }
+  return NextResponse.json({ ok: true });
+}

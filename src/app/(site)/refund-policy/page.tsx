@@ -1,0 +1,30 @@
+import type { Metadata } from "next";
+import { LegalPage } from "@/components/site/LegalPage";
+import { BRAND, OWNER } from "@/lib/site";
+
+export const metadata: Metadata = { title: "Refund and Cancellation Policy", description: `Refund and cancellation policy of ${BRAND}.`, alternates: { canonical: "/refund-policy" } };
+
+export default function Refund() {
+  return (
+    <LegalPage title="Refund & Cancellation Policy">
+      <p>
+        {BRAND} sells instant digital unlocks (watermark removal and premium designs) for a biodata. Because you can preview your biodata completely before paying, purchases are
+        generally non-refundable once the unlock has been delivered. We still want every customer to be happy, so we offer refunds in these cases:
+      </p>
+      <h2>Eligible for a full refund</h2>
+      <ul>
+        <li>You were charged but the unlock did not work and we could not fix it (including via “Restore purchase”).</li>
+        <li>You were charged twice for the same biodata (duplicate payment).</li>
+        <li>A technical fault on our side prevents you from downloading the unwatermarked PDF or image.</li>
+      </ul>
+      <h2>How to request</h2>
+      <p>
+        Email {OWNER.email} within 7 days of payment with your Razorpay payment ID (starts with <code>pay_</code>) and a short description. We reply within 2 working days.
+      </p>
+      <h2>Refund timeline</h2>
+      <p>Approved refunds are initiated within 2 working days to the original payment method. Banks usually credit refunds within 5–7 working days.</p>
+      <h2>Cancellation</h2>
+      <p>There is no subscription, so there is nothing to cancel. If a payment fails or is cancelled before completion, no money is taken; any amount debited by your bank for a failed payment is reversed automatically by the bank/Razorpay, typically within 5–7 working days.</p>
+    </LegalPage>
+  );
+}
