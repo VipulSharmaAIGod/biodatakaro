@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { siteFontVars } from "@/lib/fonts";
 import { BRAND, SITE_URL } from "@/lib/site";
+import { Analytics } from "@/components/Analytics";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -33,7 +34,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en-IN" className={siteFontVars}>
-      <body className="flex min-h-dvh flex-col antialiased">{children}</body>
+      <body className="flex min-h-dvh flex-col antialiased">
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { logServerEvent } from "@/lib/analytics/server";
 import { signBlob } from "@/lib/crypto";
 import { activeProvider, paymentsAvailable } from "@/lib/payments";
 import { PRICES, UPGRADE_PAISE } from "@/lib/pricing";
@@ -38,6 +39,7 @@ export async function POST(req: Request) {
       receipt: `bk_${Date.now().toString(36)}`,
       notes: { bid, tier, upgrade: upgrade ? "1" : "0", product: "biodata_unlock" },
     });
+    logServerEvent(req, "order_created", { tier, amt: order.amountPaise, upgrade, mode: provider.mode });
     const ticket = signBlob({ oid: order.orderId, bid, tier, amt: order.amountPaise, exp: Math.floor(Date.now() / 1000) + 3 * 3600 } satisfies OrderTicket, "ticket");
     return NextResponse.json({ ...order, ticket, tier, upgrade, provider: provider.name, mode: provider.mode, ...provider.publicConfig() });
   } catch (e) {

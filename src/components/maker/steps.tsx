@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { track } from "@/lib/analytics/client";
 import { DICTS } from "@/lib/i18n/labels";
 import { HEADINGS, HEADING_GROUP_LABEL, defaultHeading } from "@/lib/headings";
 import { LANGS, type LangCode } from "@/lib/languages";
@@ -236,6 +237,7 @@ export function AboutStep({ b, update }: { b: Biodata; update: Update }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Could not write text");
       update((x) => ({ ...x, about: { ...x.about, ...data.texts } }));
+      track("ai_generate", { lang: b.lang, tone: b.tone, src: data.source || "unknown", parts: parts.length });
       setMsg({
         kind: data.note ? "info" : "ok",
         text: data.note || (data.source === "template" ? "Draft written. Edit it to make it yours." : "AI draft ready. Read it and edit anything that isn't right."),

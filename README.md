@@ -205,3 +205,17 @@ Implement `PaymentProvider` (`src/lib/payments/types.ts`): `createOrder`, `verif
 4. Add `GEMINI_API_KEY`.
 5. Set up Google Search Console: verify the domain, submit `/sitemap.xml`, and request indexing of the SEO pages.
 6. Ongoing: more long-tail pages (each language, communities, "biodata for second marriage", sample PDFs), sharing in WhatsApp and Facebook groups, YouTube Shorts and Reels demos, privacy-friendly analytics, then AdSense once traffic exists.
+
+## Analytics (privacy-friendly, no third party)
+
+- **How it works:** the browser sends a small beacon to `POST /api/t`, and server routes log their own events. Every event becomes **one stdout line**: `ANALYTICS {"v":1,"s":"<site>","e":"<event>","ts":…,"d":"<IST date>","vid":…,"p":…,"ref":…,"utm":…,"dev":…,"x":{…}}`. Render keeps these app logs for 7 days on the Hobby workspace.
+- **No cookies or stored ids:** nothing is stored on the device, and IP and user agent are never written. `vid` = sha256(daily salt | IP | UA), cut to 16 hex characters. The salt is an HMAC of `ANALYTICS_SALT_SECRET` (falling back to `UNLOCK_TOKEN_SECRET`) and the IST date, so ids rotate every day and visitors are counted uniquely per day.
+- **What's dropped:** bots, crawlers, curl, headless browsers (`navigator.webdriver`), prefetch requests and `/api/health`. On your own phone, open any page with `?notrack=1` to stop counting yourself (`?notrack=0` undoes it). Tests opt in with `?allowbot=1` and are tagged `utm_source=agent_test`; the report excludes them by default.
+- **Event names:** see `src/lib/analytics/events.ts`. Server-side events are `order_created`, `payment_success` (after signature verification, `x.amt` in paise, `x.mode` live/test/mock) and `restore`.
+- **Health endpoint:** `GET /api/health` returns `ok` and logs nothing. The keep-alive pings use it.
+- **Tests:** `npm run test:analytics` needs the local server running with its log file.
+- **Reports:** see `/workspace/analytics/README.md` on the agent box (`report.mjs`, plus the procedure for pulling logs through the Render connector).
+
+### Keep-alive (cold starts)
+
+`.github/workflows/keepalive.yml` (in this public repo, so Actions minutes are free) pings `/api/health` on **both** BiodataKaro (10:00–22:00 IST) and PhotoSizeKaro (18:00–22:00 IST). It runs every 10 minutes and pings twice per run, which keeps Render's 750 free instance-hours/month safe: about 512 h for keep-alive, leaving about 238 h for rishtaroast-api and off-peak wake-ups. GitHub disables scheduled workflows in a public repo after 60 days without commits, so push something (or re-enable the workflow) at least every two months.

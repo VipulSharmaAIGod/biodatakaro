@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BiodataDocument } from "@/components/biodata/BiodataDocument";
 import { dataUrlToBlob, downloadBlob, renderImage, renderPdf, safeFileName } from "@/lib/export";
+import { track } from "@/lib/analytics/client";
 import { checkUnlock, createOrder, getPayConfig, mockPay, openRazorpay, restorePurchase, verifyPayment, type OrderResp, type PayConfig, type UnlockResp } from "@/lib/pay-client";
 import { PRICES, rupees, tierCovers, type Tier } from "@/lib/pricing";
 import { emptyBiodata, sampleBiodata, type Biodata } from "@/lib/schema";
@@ -63,6 +64,20 @@ export default function BiodataMaker() {
         .catch(() => {});
     }
   }, [init.b.id]);
+
+  // Analytics: one builder_start per browser session, and a view of the download step.
+  useEffect(() => {
+    try {
+      if (sessionStorage.getItem("bk_builder_started")) return;
+      sessionStorage.setItem("bk_builder_started", "1");
+    } catch {
+      /* private mode */
+    }
+    track("builder_start", { resumed: !!init.b.fields.fullName });
+  }, [init.b.fields.fullName]);
+  useEffect(() => {
+    if (step === "download") track("download_step_view");
+  }, [step]);
 
   // Autosave (debounced).
   useEffect(() => {
@@ -201,7 +216,12 @@ export default function BiodataMaker() {
           <Button variant="secondary" disabled={idx === 0} onClick={() => goto(STEPS[idx - 1].id)} aria-label="Back">
             ←
           </Button>
-          <Button variant="secondary" onClick={() => setPreviewOpen(true)} data-testid="open-preview">
+          <Button variant="secondary" onClick={() => {
+              setPreviewOpen(true);
+              track("preview_template", { tpl: b.templateId, lang: b.lang });
+            }}
+            data-testid="open-preview"
+          >
             👁 Preview
           </Button>
           {idx < STEPS.length - 1 ? (
@@ -281,6 +301,7 @@ function DownloadStep({
     try {
       if (kind === "pdf") {
         downloadBlob(await renderPdf(exportRef.current, `${b.fields.fullName || "Marriage"} Biodata`), `${name}.pdf`);
+        track(watermark ? "download_free_pdf" : "download_paid_pdf", { tpl: b.templateId, lang: b.lang });
       } else {
         const url = await renderImage(exportRef.current, { type: "jpeg", pixelRatio: 2, quality: 0.92 });
         const blob = dataUrlToBlob(url);
@@ -288,7 +309,11 @@ function DownloadStep({
           const file = new File([blob], `${name}.jpg`, { type: "image/jpeg" });
           if (navigator.canShare?.({ files: [file] })) await navigator.share({ files: [file], title: "Biodata" });
           else downloadBlob(blob, `${name}.jpg`);
-        } else downloadBlob(blob, `${name}.jpg`);
+          track("share_image", { tpl: b.templateId, lang: b.lang, paid: !watermark });
+        } else {
+          downloadBlob(blob, `${name}.jpg`);
+          track(watermark ? "download_free_jpg" : "download_paid_jpg", { tpl: b.templateId, lang: b.lang });
+        }
       }
     } catch (e) {
       if ((e as Error).name !== "AbortError") setErr("Export failed. Please try again. " + ((e as Error).message || ""));
@@ -300,6 +325,7 @@ function DownloadStep({
   const buy = async (tier: Tier) => {
     setErr("");
     setBusy("pay");
+    track("checkout_open", { tier, tpl: b.templateId, upgrade: tier === "premium" && unlock?.tier === "basic" });
     try {
       const o = await createOrder(b.id, tier, unlock?.token);
       const desc = `${PRICES[tier].label} biodata unlock`;

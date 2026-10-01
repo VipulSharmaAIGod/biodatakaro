@@ -1,0 +1,52 @@
+# Keeps the free Render instances warm during Indian peak hours only, within the workspace's
+# 750 free instance-hours/month (shared by ALL free web services, incl. rishtaroast-api).
+#
+# Windows (IST)                      awake/day*   ×31 days
+#   BiodataKaro   10:00 – 22:00        ~12.25 h     ~380 h
+#   PhotoSizeKaro 18:00 – 22:00        ~4.25 h      ~132 h
+#   keep-alive total                                ~512 h  → leaves ~238 h for rishtaroast-api + off-peak wake-ups
+#   * Render spins an idle free service down 15 min after the last request, hence the +0.25 h.
+# Exceeding 750 h suspends ALL free services in the workspace until the 1st, so keep the total well below it.
+# To change windows edit the WINDOWS table below (minutes after 00:00 UTC; IST = UTC+5:30).
+name: keepalive
+
+on:
+  schedule:
+    - cron: "*/10 4-16 * * *" # every 10 min, 04:00–16:50 UTC = 09:30–22:20 IST; the script filters per site
+  workflow_dispatch: {}
+
+concurrency:
+  group: keepalive
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Ping sites inside their windows
+        shell: bash
+        run: |
+          # name|url|start_utc_min|end_utc_min
+          WINDOWS=(
+            "biodatakaro|https://biodatakaro.onrender.com/api/health|270|990"     # 04:30–16:30 UTC = 10:00–22:00 IST
+            "photosizekaro|https://photosizekaro.onrender.com/api/health|750|990" # 12:30–16:30 UTC = 18:00–22:00 IST
+          )
+          ping_round() {
+            now=$(( 10#$(date -u +%H) * 60 + 10#$(date -u +%M) ))
+            for w in "${WINDOWS[@]}"; do
+              IFS='|' read -r name url start end <<< "$w"
+              if [ "$now" -ge "$start" ] && [ "$now" -lt "$end" ]; then
+                code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 90 -A 'keepalive-github-actions' "$url" || echo 000)
+                echo "$(date -u +%H:%MZ) $name → $code"
+              else
+                echo "$(date -u +%H:%MZ) $name outside window, skipped"
+              fi
+            done
+          }
+          # Two rounds 5 min apart so a late/skipped scheduled run still leaves < 15 min between pings.
+          ping_round
+          sleep 300
+          ping_round

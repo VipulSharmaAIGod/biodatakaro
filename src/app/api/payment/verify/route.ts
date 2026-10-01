@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { logServerEvent } from "@/lib/analytics/server";
 import { readBlob } from "@/lib/crypto";
 import { activeProvider, paymentsAvailable } from "@/lib/payments";
 import { issueUnlockToken } from "@/lib/unlock-token";
@@ -19,5 +20,6 @@ export async function POST(req: Request) {
   if (!ok) return NextResponse.json({ error: "Payment verification failed." }, { status: 400 });
 
   const { token, payload } = issueUnlockToken({ bid: ticket.bid, tier: ticket.tier, pid: String(body.paymentId), mode: provider.mode });
+  logServerEvent(req, "payment_success", { tier: ticket.tier, amt: ticket.amt, mode: provider.mode });
   return NextResponse.json({ token, tier: payload.tier, exp: payload.exp, biodataId: payload.bid, paymentId: payload.pid });
 }
