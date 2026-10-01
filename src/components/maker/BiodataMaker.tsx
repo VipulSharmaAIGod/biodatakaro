@@ -94,7 +94,12 @@ export default function BiodataMaker() {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-3 pb-28 pt-3 sm:px-5 lg:pb-10">
-      {cfg?.mode === "mock" && (
+      {cfg && !cfg.available && (
+        <div className="mb-3 rounded-xl border border-stone-300 bg-white px-3 py-2 text-[13px] text-stone-700" data-testid="payments-off-banner">
+          Paid downloads are being set up. You can still create your biodata and download the free version with a watermark.
+        </div>
+      )}
+      {cfg?.mode === "mock" && cfg.available && (
         <div className="mb-3 rounded-xl border border-amber-300 bg-amber-50 px-3 py-2 text-[13px] text-amber-900" data-testid="mock-banner">
           <b>TEST MODE:</b> payments are simulated (no Razorpay keys configured). No real money is charged.
         </div>

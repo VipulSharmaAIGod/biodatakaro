@@ -6,6 +6,8 @@ export interface PayConfig {
   provider: "razorpay" | "mock";
   mode: "live" | "test" | "mock";
   keyId?: string;
+  /** false when no gateway is configured and mock mode is disabled (e.g. Vercel production without keys) */
+  available: boolean;
   prices: { basic: number; premium: number; upgrade: number };
 }
 

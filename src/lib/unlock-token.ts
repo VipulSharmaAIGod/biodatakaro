@@ -1,7 +1,7 @@
 import "server-only";
 import { readBlob, signBlob } from "./crypto";
 import { UNLOCK_VALIDITY_DAYS, type Tier } from "./pricing";
-import { activeProvider } from "./payments";
+import { activeProvider, mockAllowed } from "./payments";
 
 /** Stateless unlock token — no database. Bound to one biodata id. */
 export interface UnlockPayload {
@@ -26,7 +26,7 @@ export function verifyUnlockToken(token: string, bid?: string): UnlockPayload | 
   if (p.exp < Date.now() / 1000) return null;
   if (bid && p.bid !== bid) return null;
   // Tokens minted by the mock provider never work once a real gateway is configured.
-  if (p.mode === "mock" && activeProvider().mode !== "mock") return null;
+  if (p.mode === "mock" && (activeProvider().mode !== "mock" || !mockAllowed())) return null;
   return p;
 }
 

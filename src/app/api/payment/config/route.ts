@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { activeProvider } from "@/lib/payments";
+import { activeProvider, mockAllowed } from "@/lib/payments";
 import { PRICES, UPGRADE_PAISE } from "@/lib/pricing";
 
 export const dynamic = "force-dynamic";
@@ -9,6 +9,7 @@ export function GET() {
   return NextResponse.json({
     provider: p.name,
     mode: p.mode,
+    available: p.name !== "mock" || mockAllowed(),
     ...p.publicConfig(),
     prices: { basic: PRICES.basic.amountPaise, premium: PRICES.premium.amountPaise, upgrade: UPGRADE_PAISE },
   });
