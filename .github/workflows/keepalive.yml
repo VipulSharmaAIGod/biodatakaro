@@ -1,3 +1,7 @@
+# BACKUP wake-up only. GitHub's */10 schedule proved unreliable (2 of ~78 runs fired on 1-2 Oct 2026).
+# The primary keep-alive is the in-app self-ping (src/lib/keepalive.ts) which keeps both sites warm once
+# either is woken inside its window; this workflow and the agent-box pinger just add wake-up chances.
+#
 # Keeps the free Render instances warm during Indian peak hours only, within the workspace's
 # 750 free instance-hours/month (shared by ALL free web services, incl. rishtaroast-api).
 #
